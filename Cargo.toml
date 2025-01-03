@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 rocket = { version = "0.5.1", features = ["json"] }
 puimuri-trainer = { path = "puimuri-trainer" }
+dotenv = "0.15.0"

@@ -37,5 +37,6 @@ fn answer(answer: f64, exercise: Json<Exercise>) -> AnswerResponder {
 
 #[launch]
 fn rocket() -> _ {
+    dotenv::dotenv().ok();
     rocket::build().mount("/api", routes![exercise, answer])
 }
