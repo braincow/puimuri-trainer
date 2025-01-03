@@ -25,7 +25,6 @@ pub enum TrainerError {
 
 /// What type of an excerise is in question?
 #[derive(Copy, Clone, Debug, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum ExerciseType {
     /// By default we handle Ohms law
     #[default]
@@ -38,7 +37,6 @@ pub enum ExerciseType {
 
 /// What type of variable are we handling?
 #[derive(PartialEq, Copy, Clone, Debug, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum Variable {
     /// Voltage or I in volts
     Voltage,
@@ -53,7 +51,6 @@ pub enum Variable {
 
 /// What type of an unit is the ExerciseSolution unit in
 #[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub enum Unit {
     /// Volts
     Volt,
@@ -67,7 +64,6 @@ pub enum Unit {
 
 /// Contains the solution and work needed to reach that answer for a spesific Exercise
 #[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ExerciseSolution {
     /// Shows the work needed to reach the answer
     pub steps: Vec<String>,
@@ -79,7 +75,6 @@ pub struct ExerciseSolution {
 
 /// An Excersise that user must solve or which is to be explained to the user
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Exercise {
     /// Type of the excercise
     pub exercise_type: ExerciseType,
