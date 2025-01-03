@@ -1,3 +1,9 @@
+#![warn(missing_docs)]
+
+//! PUImURI trainer for Ohms law, power equation and their combinations
+//!
+//! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
+
 use puimuri_trainer::{ExcerciseBuilder, Exercise, ExerciseSolution};
 use rocket::serde::json::Json;
 
