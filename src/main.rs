@@ -28,7 +28,7 @@ enum AnswerResponder {
 #[post("/exercise/answer/<answer>", data = "<exercise>")]
 fn answer(answer: f64, exercise: Json<Exercise>) -> AnswerResponder {
     let solution = exercise.solve().unwrap();
-    if answer == solution.answer {
+    if (answer - solution.answer).abs() < 0.01 {
         AnswerResponder::CorrectAnswer(Json(solution))
     } else {
         AnswerResponder::IncorrectAnswer(Json(solution))
