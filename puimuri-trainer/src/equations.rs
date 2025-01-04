@@ -70,7 +70,7 @@ pub struct EquationExercise {
     /// What other variables in the equation are already known
     pub given_variables: Vec<(EquationVariable, f64)>,
     /// What is the correct answer for this exercise
-    #[serde(skip_serializing)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub correct_answer: Option<f64>,
 }
 
@@ -326,7 +326,7 @@ impl EquationExerciseBuilder {
                 .unwrap();
                 let mut given_variables = Vec::new();
 
-                let correct_answer = match missing_variable {
+                let _correct_answer = match missing_variable {
                     EquationVariable::Voltage => {
                         given_variables.push((EquationVariable::Resistance, resistance));
                         given_variables.push((EquationVariable::Current, current));
@@ -346,7 +346,10 @@ impl EquationExerciseBuilder {
                 };
                 self.exercise.missing_variable = *missing_variable;
                 self.exercise.given_variables = given_variables;
-                self.exercise.correct_answer = Some(correct_answer);
+                #[cfg(debug_assertions)]
+                {
+                    self.exercise.correct_answer = Some(_correct_answer);
+                }
             }
             EquationExerciseType::Power => {
                 let missing_variable = [
@@ -357,7 +360,7 @@ impl EquationExerciseBuilder {
                 .choose(&mut self.rng)
                 .unwrap();
                 let mut given_variables = Vec::new();
-                let correct_answer = match missing_variable {
+                let _correct_answer = match missing_variable {
                     EquationVariable::Power => {
                         given_variables.push((EquationVariable::Voltage, voltage));
                         given_variables.push((EquationVariable::Current, current));
@@ -377,7 +380,10 @@ impl EquationExerciseBuilder {
                 };
                 self.exercise.missing_variable = *missing_variable;
                 self.exercise.given_variables = given_variables;
-                self.exercise.correct_answer = Some(correct_answer);
+                #[cfg(debug_assertions)]
+                {
+                    self.exercise.correct_answer = Some(_correct_answer);
+                }
             }
             EquationExerciseType::Combined => {
                 let selection = [
@@ -400,7 +406,7 @@ impl EquationExerciseBuilder {
                 .choose(&mut self.rng)
                 .unwrap();
                 let mut given_variables = Vec::new();
-                let correct_answer = match selection {
+                let _correct_answer = match selection {
                     (
                         EquationVariable::Voltage,
                         EquationVariable::Resistance,
@@ -432,7 +438,10 @@ impl EquationExerciseBuilder {
                 };
                 self.exercise.missing_variable = selection.2;
                 self.exercise.given_variables = given_variables;
-                self.exercise.correct_answer = Some(correct_answer);
+                #[cfg(debug_assertions)]
+                {
+                    self.exercise.correct_answer = Some(_correct_answer);
+                }
             }
         }
         self.exercise.clone() // clone the protype exercise so that it can be re-used when calling build() again
