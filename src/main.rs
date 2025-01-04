@@ -4,16 +4,16 @@
 //!
 //! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
 
-use puimuri_trainer::{ExcerciseBuilder, Exercise, ExerciseSolution};
+use puimuri_trainer::equations::{Exercise, ExerciseBuilder, ExerciseSolution};
 use rocket::serde::json::Json;
 
 #[macro_use]
 extern crate rocket;
 
-#[get("/exercise")]
+#[get("/equation")]
 fn exercise() -> Json<Exercise> {
-    let excercise_builder = ExcerciseBuilder::default();
-    let excercise = excercise_builder.build_with_random_excercisetype();
+    let excercise_builder = ExerciseBuilder::default();
+    let excercise = excercise_builder.build_with_random_exercisetype();
     Json(excercise)
 }
 
@@ -25,7 +25,7 @@ enum AnswerResponder {
     CorrectAnswer(Json<ExerciseSolution>),
 }
 
-#[post("/exercise/answer/<answer>", data = "<exercise>")]
+#[post("/equation/answer/<answer>", data = "<exercise>")]
 fn answer(answer: f64, exercise: Json<Exercise>) -> AnswerResponder {
     let solution = exercise.solve().unwrap();
     if (answer - solution.answer).abs() < 0.01 {
