@@ -12,7 +12,7 @@ use crate::TrainerError;
 
 /// What type of an excerise is in question?
 #[derive(Copy, Clone, Debug, Default, Serialize, Deserialize)]
-pub enum ExerciseType {
+pub enum EquationExerciseType {
     /// By default we handle Ohms law
     #[default]
     OhmsLaw,
@@ -24,7 +24,7 @@ pub enum ExerciseType {
 
 /// What type of variable are we handling?
 #[derive(PartialEq, Copy, Clone, Debug, Default, Serialize, Deserialize)]
-pub enum Variable {
+pub enum EquationVariable {
     /// Voltage or I in volts
     Voltage,
     /// Current or U in amperes
@@ -38,7 +38,7 @@ pub enum Variable {
 
 /// What type of an unit is the ExerciseSolution unit in
 #[derive(Debug, Clone, Serialize)]
-pub enum Unit {
+pub enum EquationUnit {
     /// Volts
     Volt,
     /// Amperes
@@ -51,33 +51,33 @@ pub enum Unit {
 
 /// Contains the solution and work needed to reach that answer for a spesific Exercise
 #[derive(Debug, Clone, Serialize)]
-pub struct ExerciseSolution {
+pub struct EquationExerciseSolution {
     /// Shows the work needed to reach the answer
     pub steps: Vec<String>,
     /// Contains the answer to the exercise
     pub answer: f64,
     /// Unit type of the answer
-    pub unit: Unit,
+    pub unit: EquationUnit,
 }
 
 /// An Excersise that user must solve or which is to be explained to the user
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct Exercise {
+pub struct EquationExercise {
     /// Type of the exercise
-    pub exercise_type: ExerciseType,
+    pub exercise_type: EquationExerciseType,
     /// What variable is missing in the equation that user needs to solve
-    pub missing_variable: Variable,
+    pub missing_variable: EquationVariable,
     /// What other variables in the equation are already known
-    pub given_variables: Vec<(Variable, f64)>,
+    pub given_variables: Vec<(EquationVariable, f64)>,
     /// What is the correct answer for this exercise
     #[serde(skip_serializing)]
     pub correct_answer: Option<f64>,
 }
 
-impl Exercise {
+impl EquationExercise {
     /// Creates a new ExcerciseBuilder that can build a new exercise
-    pub fn new() -> ExerciseBuilder {
-        ExerciseBuilder::new()
+    pub fn new() -> EquationExerciseBuilder {
+        EquationExerciseBuilder::new()
     }
 
     /// Check the answer
@@ -93,12 +93,12 @@ impl Exercise {
     }
 
     /// Solves the equation and question, returns with precise solution and work needed to achieve the result
-    pub fn solve(&self) -> Result<ExerciseSolution> {
+    pub fn solve(&self) -> Result<EquationExerciseSolution> {
         let mut steps = Vec::new();
         let answer: f64;
-        let unit: Unit;
+        let unit: EquationUnit;
 
-        let get_value = |variable: Variable| -> Result<f64, TrainerError> {
+        let get_value = |variable: EquationVariable| -> Result<f64, TrainerError> {
             self.given_variables
                 .iter()
                 .find(|(v, _)| *v == variable)
@@ -107,89 +107,89 @@ impl Exercise {
         };
 
         match self.exercise_type {
-            ExerciseType::OhmsLaw => match self.missing_variable {
-                Variable::Voltage => {
-                    let r = get_value(Variable::Resistance)?;
-                    let i = get_value(Variable::Current)?;
-                    unit = Unit::Volt;
+            EquationExerciseType::OhmsLaw => match self.missing_variable {
+                EquationVariable::Voltage => {
+                    let r = get_value(EquationVariable::Resistance)?;
+                    let i = get_value(EquationVariable::Current)?;
+                    unit = EquationUnit::Volt;
                     steps.push("U = R * I".to_string());
                     steps.push(format!("U = {}Ω * {}A", r, i));
                     answer = r * i;
                 }
-                Variable::Current => {
-                    let u = get_value(Variable::Voltage)?;
-                    let r = get_value(Variable::Resistance)?;
-                    unit = Unit::Ampere;
+                EquationVariable::Current => {
+                    let u = get_value(EquationVariable::Voltage)?;
+                    let r = get_value(EquationVariable::Resistance)?;
+                    unit = EquationUnit::Ampere;
                     steps.push("I = U / R".to_string());
                     steps.push(format!("I = {}V / {}Ω", u, r));
                     answer = u / r;
                 }
-                Variable::Resistance => {
-                    let u = get_value(Variable::Voltage)?;
-                    let i = get_value(Variable::Current)?;
-                    unit = Unit::Ohm;
+                EquationVariable::Resistance => {
+                    let u = get_value(EquationVariable::Voltage)?;
+                    let i = get_value(EquationVariable::Current)?;
+                    unit = EquationUnit::Ohm;
                     steps.push("R = U / I".to_string());
                     steps.push(format!("R = {}V / {}A", u, i));
                     answer = u / i;
                 }
                 _ => unreachable!(),
             },
-            ExerciseType::Power => match self.missing_variable {
-                Variable::Power => {
-                    let u = get_value(Variable::Voltage)?;
-                    let i = get_value(Variable::Current)?;
-                    unit = Unit::Watt;
+            EquationExerciseType::Power => match self.missing_variable {
+                EquationVariable::Power => {
+                    let u = get_value(EquationVariable::Voltage)?;
+                    let i = get_value(EquationVariable::Current)?;
+                    unit = EquationUnit::Watt;
                     steps.push("P = U * I".to_string());
                     steps.push(format!("P = {}V * {}A", u, i));
                     answer = u * i;
                 }
-                Variable::Voltage => {
-                    let p = get_value(Variable::Power)?;
-                    let i = get_value(Variable::Current)?;
-                    unit = Unit::Volt;
+                EquationVariable::Voltage => {
+                    let p = get_value(EquationVariable::Power)?;
+                    let i = get_value(EquationVariable::Current)?;
+                    unit = EquationUnit::Volt;
                     steps.push("U = P / I".to_string());
                     steps.push(format!("U = {}W / {}A", p, i));
                     answer = p / i;
                 }
-                Variable::Current => {
-                    let p = get_value(Variable::Power)?;
-                    let u = get_value(Variable::Voltage)?;
-                    unit = Unit::Ampere;
+                EquationVariable::Current => {
+                    let p = get_value(EquationVariable::Power)?;
+                    let u = get_value(EquationVariable::Voltage)?;
+                    unit = EquationUnit::Ampere;
                     steps.push("I = P / U".to_string());
                     steps.push(format!("I = {}W / {}V", p, u));
                     answer = p / u;
                 }
                 _ => unreachable!(),
             },
-            ExerciseType::Combined => match self.missing_variable {
-                Variable::Power => {
-                    let u = get_value(Variable::Voltage)?;
-                    let r = get_value(Variable::Resistance)?;
-                    unit = Unit::Watt;
+            EquationExerciseType::Combined => match self.missing_variable {
+                EquationVariable::Power => {
+                    let u = get_value(EquationVariable::Voltage)?;
+                    let r = get_value(EquationVariable::Resistance)?;
+                    unit = EquationUnit::Watt;
                     steps.push("P = U^2 / R".to_string());
                     steps.push(format!("P = {}V^2 / {}Ω", u, r));
                     answer = (u * u) / r;
                 }
-                Variable::Current => {
-                    let p = get_value(Variable::Power)?;
-                    let r = get_value(Variable::Resistance)?;
-                    unit = Unit::Ampere;
+                EquationVariable::Current => {
+                    let p = get_value(EquationVariable::Power)?;
+                    let r = get_value(EquationVariable::Resistance)?;
+                    unit = EquationUnit::Ampere;
                     steps.push("I = √(P / R)".to_string());
                     steps.push(format!("I = √({}W / {}Ω)", p, r));
                     answer = (p / r).sqrt();
                 }
-                Variable::Voltage => {
-                    let p = get_value(Variable::Power)?;
-                    let r = get_value(Variable::Resistance)?;
-                    unit = Unit::Volt;
+                EquationVariable::Voltage => {
+                    let p = get_value(EquationVariable::Power)?;
+                    let r = get_value(EquationVariable::Resistance)?;
+                    unit = EquationUnit::Volt;
                     steps.push("U = √(P * R)".to_string());
                     steps.push(format!("U = √({}W * {}Ω)", p, r));
                     answer = (p * r).sqrt();
                 }
-                Variable::Resistance => {
-                    let p = get_value(Variable::Power)?;
-                    let u = get_value(Variable::Voltage)?;
-                    unit = Unit::Ohm;
+                EquationVariable::Resistance => {
+                    let p = get_value(EquationVariable::Power)?;
+                    let u = get_value(EquationVariable::Voltage)?;
+                    unit = EquationUnit::Ohm;
                     steps.push("R = U^2 / P".to_string());
                     steps.push(format!("R = {}V^2 / {}W", u, p));
                     answer = (u * u) / p;
@@ -197,7 +197,7 @@ impl Exercise {
             },
         }
 
-        let solution = ExerciseSolution {
+        let solution = EquationExerciseSolution {
             steps,
             answer,
             unit,
@@ -218,8 +218,8 @@ impl Exercise {
 
 /// Builder pattern for creating an Exercise
 #[derive(Debug)]
-pub struct ExerciseBuilder {
-    exercise: Exercise,
+pub struct EquationExerciseBuilder {
+    exercise: EquationExercise,
     voltage_range: (f64, f64),
     current_range: (f64, f64),
     resistance_range: (f64, f64),
@@ -227,10 +227,10 @@ pub struct ExerciseBuilder {
     rng: ThreadRng,
 }
 
-impl Default for ExerciseBuilder {
+impl Default for EquationExerciseBuilder {
     fn default() -> Self {
-        ExerciseBuilder {
-            exercise: Exercise::default(),
+        EquationExerciseBuilder {
+            exercise: EquationExercise::default(),
             voltage_range: (1.0, 240.0),
             current_range: (0.1, 10.0),
             resistance_range: (1.0, 1000.0),
@@ -240,10 +240,10 @@ impl Default for ExerciseBuilder {
     }
 }
 
-impl ExerciseBuilder {
+impl EquationExerciseBuilder {
     /// Creates a new ExcersiceBuilder with default settings
-    pub fn new() -> ExerciseBuilder {
-        ExerciseBuilder::default()
+    pub fn new() -> EquationExerciseBuilder {
+        EquationExerciseBuilder::default()
     }
 
     /// Allows alteration of voltage range min and max values
@@ -287,13 +287,13 @@ impl ExerciseBuilder {
     }
 
     /// Alter type of the exercise
-    pub fn set_type(mut self, new_type: ExerciseType) -> Self {
+    pub fn set_type(mut self, new_type: EquationExerciseType) -> Self {
         self.exercise.exercise_type = new_type;
         self
     }
 
     /// Builds and returns an exercise based on the settings in the builder and proto Exercise within it
-    pub fn build(mut self) -> Exercise {
+    pub fn build(mut self) -> EquationExercise {
         let voltage = self
             .rng
             .gen_range::<f64, _>(self.voltage_range.0..self.voltage_range.1)
@@ -316,26 +316,30 @@ impl ExerciseBuilder {
             / 100.0; // Round to 2 decimal places
 
         match self.exercise.exercise_type {
-            ExerciseType::OhmsLaw => {
-                let missing_variable = [Variable::Voltage, Variable::Current, Variable::Resistance]
-                    .choose(&mut self.rng)
-                    .unwrap();
+            EquationExerciseType::OhmsLaw => {
+                let missing_variable = [
+                    EquationVariable::Voltage,
+                    EquationVariable::Current,
+                    EquationVariable::Resistance,
+                ]
+                .choose(&mut self.rng)
+                .unwrap();
                 let mut given_variables = Vec::new();
 
                 let correct_answer = match missing_variable {
-                    Variable::Voltage => {
-                        given_variables.push((Variable::Resistance, resistance));
-                        given_variables.push((Variable::Current, current));
+                    EquationVariable::Voltage => {
+                        given_variables.push((EquationVariable::Resistance, resistance));
+                        given_variables.push((EquationVariable::Current, current));
                         resistance * current
                     }
-                    Variable::Current => {
-                        given_variables.push((Variable::Voltage, voltage));
-                        given_variables.push((Variable::Resistance, resistance));
+                    EquationVariable::Current => {
+                        given_variables.push((EquationVariable::Voltage, voltage));
+                        given_variables.push((EquationVariable::Resistance, resistance));
                         voltage / resistance
                     }
-                    Variable::Resistance => {
-                        given_variables.push((Variable::Voltage, voltage));
-                        given_variables.push((Variable::Current, current));
+                    EquationVariable::Resistance => {
+                        given_variables.push((EquationVariable::Voltage, voltage));
+                        given_variables.push((EquationVariable::Current, current));
                         voltage / current
                     }
                     _ => unreachable!(),
@@ -344,25 +348,29 @@ impl ExerciseBuilder {
                 self.exercise.given_variables = given_variables;
                 self.exercise.correct_answer = Some(correct_answer);
             }
-            ExerciseType::Power => {
-                let missing_variable = [Variable::Power, Variable::Voltage, Variable::Current]
-                    .choose(&mut self.rng)
-                    .unwrap();
+            EquationExerciseType::Power => {
+                let missing_variable = [
+                    EquationVariable::Power,
+                    EquationVariable::Voltage,
+                    EquationVariable::Current,
+                ]
+                .choose(&mut self.rng)
+                .unwrap();
                 let mut given_variables = Vec::new();
                 let correct_answer = match missing_variable {
-                    Variable::Power => {
-                        given_variables.push((Variable::Voltage, voltage));
-                        given_variables.push((Variable::Current, current));
+                    EquationVariable::Power => {
+                        given_variables.push((EquationVariable::Voltage, voltage));
+                        given_variables.push((EquationVariable::Current, current));
                         voltage * current
                     }
-                    Variable::Voltage => {
-                        given_variables.push((Variable::Power, power));
-                        given_variables.push((Variable::Current, current));
+                    EquationVariable::Voltage => {
+                        given_variables.push((EquationVariable::Power, power));
+                        given_variables.push((EquationVariable::Current, current));
                         power / current
                     }
-                    Variable::Current => {
-                        given_variables.push((Variable::Power, power));
-                        given_variables.push((Variable::Voltage, voltage));
+                    EquationVariable::Current => {
+                        given_variables.push((EquationVariable::Power, power));
+                        given_variables.push((EquationVariable::Voltage, voltage));
                         power / voltage
                     }
                     _ => unreachable!(),
@@ -371,29 +379,53 @@ impl ExerciseBuilder {
                 self.exercise.given_variables = given_variables;
                 self.exercise.correct_answer = Some(correct_answer);
             }
-            ExerciseType::Combined => {
+            EquationExerciseType::Combined => {
                 let selection = [
-                    (Variable::Voltage, Variable::Resistance, Variable::Power),
-                    (Variable::Power, Variable::Resistance, Variable::Current),
-                    (Variable::Power, Variable::Voltage, Variable::Resistance),
+                    (
+                        EquationVariable::Voltage,
+                        EquationVariable::Resistance,
+                        EquationVariable::Power,
+                    ),
+                    (
+                        EquationVariable::Power,
+                        EquationVariable::Resistance,
+                        EquationVariable::Current,
+                    ),
+                    (
+                        EquationVariable::Power,
+                        EquationVariable::Voltage,
+                        EquationVariable::Resistance,
+                    ),
                 ]
                 .choose(&mut self.rng)
                 .unwrap();
                 let mut given_variables = Vec::new();
                 let correct_answer = match selection {
-                    (Variable::Voltage, Variable::Resistance, Variable::Power) => {
-                        given_variables.push((Variable::Voltage, voltage));
-                        given_variables.push((Variable::Resistance, resistance));
+                    (
+                        EquationVariable::Voltage,
+                        EquationVariable::Resistance,
+                        EquationVariable::Power,
+                    ) => {
+                        given_variables.push((EquationVariable::Voltage, voltage));
+                        given_variables.push((EquationVariable::Resistance, resistance));
                         (voltage * voltage) / resistance
                     }
-                    (Variable::Power, Variable::Resistance, Variable::Current) => {
-                        given_variables.push((Variable::Power, power));
-                        given_variables.push((Variable::Resistance, resistance));
+                    (
+                        EquationVariable::Power,
+                        EquationVariable::Resistance,
+                        EquationVariable::Current,
+                    ) => {
+                        given_variables.push((EquationVariable::Power, power));
+                        given_variables.push((EquationVariable::Resistance, resistance));
                         (power / resistance).sqrt()
                     }
-                    (Variable::Power, Variable::Voltage, Variable::Resistance) => {
-                        given_variables.push((Variable::Power, power));
-                        given_variables.push((Variable::Voltage, voltage));
+                    (
+                        EquationVariable::Power,
+                        EquationVariable::Voltage,
+                        EquationVariable::Resistance,
+                    ) => {
+                        given_variables.push((EquationVariable::Power, power));
+                        given_variables.push((EquationVariable::Voltage, voltage));
                         (voltage * voltage) / power
                     }
                     _ => unreachable!(),
@@ -407,11 +439,11 @@ impl ExerciseBuilder {
     }
 
     /// Builds a new exercise with randomized ExerciseType
-    pub fn build_with_random_exercisetype(mut self) -> Exercise {
+    pub fn build_with_random_exercisetype(mut self) -> EquationExercise {
         let exercise_types = [
-            ExerciseType::OhmsLaw,
-            ExerciseType::Power,
-            ExerciseType::Combined,
+            EquationExerciseType::OhmsLaw,
+            EquationExerciseType::Power,
+            EquationExerciseType::Combined,
         ];
         let exercise_type = exercise_types.choose(&mut self.rng).unwrap();
         self.exercise.exercise_type = *exercise_type;

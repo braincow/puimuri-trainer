@@ -4,7 +4,7 @@
 //!
 //! This library provides a trainer implementation that creates and solves excercesis
 
-use equations::{ExerciseSolution, Variable};
+use equations::{EquationExerciseSolution, EquationVariable};
 use thiserror::Error;
 
 pub mod equations;
@@ -17,8 +17,8 @@ pub enum TrainerError {
     MinLargerThanMax,
     /// Variable is missing somewhere
     #[error("Variable is missing in definitions")]
-    MissingVariable(Variable),
+    MissingVariable(EquationVariable),
     /// The exercise resolver is getting a different result than what is indicated by the ecercise itself
     #[error("Exercise solution does not match with solved solution")]
-    EquationResolveError(ExerciseSolution),
+    EquationResolveError(EquationExerciseSolution),
 }

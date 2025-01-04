@@ -4,15 +4,17 @@
 //!
 //! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
 
-use puimuri_trainer::equations::{Exercise, ExerciseBuilder, ExerciseSolution};
+use puimuri_trainer::equations::{
+    EquationExercise, EquationExerciseBuilder, EquationExerciseSolution,
+};
 use rocket::serde::json::Json;
 
 #[macro_use]
 extern crate rocket;
 
 #[get("/equation")]
-fn exercise() -> Json<Exercise> {
-    let excercise_builder = ExerciseBuilder::default();
+fn exercise() -> Json<EquationExercise> {
+    let excercise_builder = EquationExerciseBuilder::default();
     let excercise = excercise_builder.build_with_random_exercisetype();
     Json(excercise)
 }
@@ -20,13 +22,13 @@ fn exercise() -> Json<Exercise> {
 #[derive(Responder)]
 enum AnswerResponder {
     #[response(status = 412, content_type = "json")] // precondition failed
-    IncorrectAnswer(Json<ExerciseSolution>),
+    IncorrectAnswer(Json<EquationExerciseSolution>),
     #[response(status = 200, content_type = "json")] // ok
-    CorrectAnswer(Json<ExerciseSolution>),
+    CorrectAnswer(Json<EquationExerciseSolution>),
 }
 
 #[post("/equation/answer/<answer>", data = "<exercise>")]
-fn answer(answer: f64, exercise: Json<Exercise>) -> AnswerResponder {
+fn answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerResponder {
     let solution = exercise.solve().unwrap();
     if (answer - solution.answer).abs() < 0.01 {
         AnswerResponder::CorrectAnswer(Json(solution))
