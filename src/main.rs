@@ -13,10 +13,10 @@ use rocket::serde::json::Json;
 extern crate rocket;
 
 #[get("/equation")]
-fn exercise() -> Json<EquationExercise> {
-    let excercise_builder = EquationExerciseBuilder::default();
-    let excercise = excercise_builder.build_with_random_exercisetype();
-    Json(excercise)
+fn equation() -> Json<EquationExercise> {
+    let exercise_builder = EquationExerciseBuilder::default();
+    let exercise = exercise_builder.build_with_random_exercisetype();
+    Json(exercise)
 }
 
 #[derive(Responder)]
@@ -28,7 +28,7 @@ enum AnswerResponder {
 }
 
 #[post("/equation/answer/<answer>", data = "<exercise>")]
-fn answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerResponder {
+fn equation_answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerResponder {
     let solution = exercise.solve().unwrap();
     if (answer - solution.answer).abs() < 0.01 {
         AnswerResponder::CorrectAnswer(Json(solution))
@@ -40,5 +40,5 @@ fn answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerResponder {
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
-    rocket::build().mount("/api", routes![exercise, answer])
+    rocket::build().mount("/api", routes![equation, equation_answer])
 }
