@@ -7,21 +7,8 @@
 use eyre::{Context, Result};
 use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
-/// Error types that this trainer library can return
-#[derive(Error, Debug)]
-pub enum TrainerError {
-    /// Programmer or end-user if allowed by programmer is trying to initialize excersise builder with values that do not make sense
-    #[error("Minimum value is larger than maximum value")]
-    MinLargerThanMax,
-    /// Variable is missing somewhere
-    #[error("Variable is missing in definitions")]
-    MissingVariable(Variable),
-    /// The exercise resolver is getting a different result than what is indicated by the ecercise itself
-    #[error("Exercise solution does not match with solved solution")]
-    ResolveError(ExerciseSolution),
-}
+use crate::TrainerError;
 
 /// What type of an excerise is in question?
 #[derive(Copy, Clone, Debug, Default, Serialize, Deserialize)]
@@ -220,7 +207,7 @@ impl Exercise {
             if solution.answer != correct_answer {
                 let sol_answ = solution.answer;
                 let self_answ = correct_answer;
-                return Err(TrainerError::ResolveError(solution))
+                return Err(TrainerError::EquationResolveError(solution))
                 .with_context(|| format!("Unable to verify solution properly. Solution answer: {} != Exercise answer {}", sol_answ, self_answ));
             }
         }
