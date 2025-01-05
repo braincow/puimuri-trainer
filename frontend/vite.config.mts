@@ -43,6 +43,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false, // Only if your backend API uses HTTPS and you have a self-signed certificate in dev
+      },
+    },
   },
   css: {
     preprocessorOptions: {
