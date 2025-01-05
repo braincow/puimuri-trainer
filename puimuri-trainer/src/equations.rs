@@ -115,6 +115,7 @@ impl EquationExercise {
                     steps.push("U = R * I".to_string());
                     steps.push(format!("U = {}Ω * {}A", r, i));
                     answer = r * i;
+                    steps.push(format!("U = {}", answer));
                 }
                 EquationVariable::Current => {
                     let u = get_value(EquationVariable::Voltage)?;
@@ -123,6 +124,7 @@ impl EquationExercise {
                     steps.push("I = U / R".to_string());
                     steps.push(format!("I = {}V / {}Ω", u, r));
                     answer = u / r;
+                    steps.push(format!("I = {}", answer));
                 }
                 EquationVariable::Resistance => {
                     let u = get_value(EquationVariable::Voltage)?;
@@ -131,6 +133,7 @@ impl EquationExercise {
                     steps.push("R = U / I".to_string());
                     steps.push(format!("R = {}V / {}A", u, i));
                     answer = u / i;
+                    steps.push(format!("R = {}", answer));
                 }
                 _ => unreachable!(),
             },
@@ -142,6 +145,7 @@ impl EquationExercise {
                     steps.push("P = U * I".to_string());
                     steps.push(format!("P = {}V * {}A", u, i));
                     answer = u * i;
+                    steps.push(format!("P = {}", answer));
                 }
                 EquationVariable::Voltage => {
                     let p = get_value(EquationVariable::Power)?;
@@ -150,6 +154,7 @@ impl EquationExercise {
                     steps.push("U = P / I".to_string());
                     steps.push(format!("U = {}W / {}A", p, i));
                     answer = p / i;
+                    steps.push(format!("U = {}", answer));
                 }
                 EquationVariable::Current => {
                     let p = get_value(EquationVariable::Power)?;
@@ -158,6 +163,7 @@ impl EquationExercise {
                     steps.push("I = P / U".to_string());
                     steps.push(format!("I = {}W / {}V", p, u));
                     answer = p / u;
+                    steps.push(format!("I = {}", answer));
                 }
                 _ => unreachable!(),
             },
@@ -169,6 +175,7 @@ impl EquationExercise {
                     steps.push("P = U^2 / R".to_string());
                     steps.push(format!("P = {}V^2 / {}Ω", u, r));
                     answer = (u * u) / r;
+                    steps.push(format!("P = {}", answer));
                 }
                 EquationVariable::Current => {
                     let p = get_value(EquationVariable::Power)?;
@@ -177,6 +184,7 @@ impl EquationExercise {
                     steps.push("I = √(P / R)".to_string());
                     steps.push(format!("I = √({}W / {}Ω)", p, r));
                     answer = (p / r).sqrt();
+                    steps.push(format!("I = {}", answer));
                 }
                 EquationVariable::Voltage => {
                     let p = get_value(EquationVariable::Power)?;
@@ -185,6 +193,7 @@ impl EquationExercise {
                     steps.push("U = √(P * R)".to_string());
                     steps.push(format!("U = √({}W * {}Ω)", p, r));
                     answer = (p * r).sqrt();
+                    steps.push(format!("U = {}", answer));
                 }
                 EquationVariable::Resistance => {
                     let p = get_value(EquationVariable::Power)?;
@@ -193,6 +202,7 @@ impl EquationExercise {
                     steps.push("R = U^2 / P".to_string());
                     steps.push(format!("R = {}V^2 / {}W", u, p));
                     answer = (u * u) / p;
+                    steps.push(format!("R = {}", answer));
                 }
             },
         }
