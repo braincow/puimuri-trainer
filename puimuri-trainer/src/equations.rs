@@ -70,7 +70,7 @@ pub struct EquationExercise {
     /// What other variables in the equation are already known
     pub given_variables: Vec<(EquationVariable, f64)>,
     /// What is the correct answer for this exercise
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", skip_deserializing)]
     pub correct_answer: Option<f64>,
 }
 
