@@ -8,7 +8,7 @@ use puimuri_trainer::equations::{
     EquationExercise, EquationExerciseBuilder, EquationExerciseSolution,
 };
 use rocket::{fs::FileServer, serde::json::Json};
-use std::env;
+use std::{env, path::PathBuf};
 
 #[macro_use]
 extern crate rocket;
@@ -41,10 +41,14 @@ fn equation_answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerRespo
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
-    rocket::build()
-        .mount("/api", routes![equation, equation_answer])
-        .mount(
-            "/",
-            FileServer::from(env::var("PUIMURI_FRONTEND_DIR").unwrap_or("static".to_string())),
-        )
+
+    let mut rocket = rocket::build();
+
+    let frontend_dir = env::var("PUIMURI_FRONTEND_DIR").unwrap_or("static".to_string());
+    let frontend_path = PathBuf::from(frontend_dir);
+    if frontend_path.exists() && frontend_path.is_dir() {
+        rocket = rocket.mount("/", FileServer::from(frontend_path));
+    }
+
+    rocket.mount("/api", routes![equation, equation_answer])
 }
