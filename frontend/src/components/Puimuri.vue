@@ -4,13 +4,23 @@
       side="end"
     >
       <v-timeline-item
+        fill-dot
+        dot-color="yellow"
+        icon="mdi-help-circle"
+      >
+        <v-img
+        width="400"
+          src="@/assets/puimuri.jpg"
+        />
+      </v-timeline-item>
+      <v-timeline-item
         v-for="(amalgam, index) in exercises" 
         :key="index"
         :dot-color="getCardColor(index)"
         fill-dot
         :icon="getCardIcon(index)"
       >
-        <v-card class="mx-auto" :color="getCardColor(index)">
+        <v-card class="mx-auto" :color="getCardColor(index)" ref="eq_card-{index}">
           <v-card-title>Harjoitus {{ amalgam.exercise.exercise_type }}</v-card-title>
           <v-card-text>
             <p>
@@ -29,7 +39,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn text="Ratkaise" @click="submitAnswer(index)" :disabled="amalgam.solution !== undefined"></v-btn>
-            <v-btn text="Avaa" :disabled="amalgam.solution === undefined" @click="amalgam.revealed=true"></v-btn>
+            <v-btn text="Näytä" :disabled="amalgam.solution === undefined" @click="amalgam.revealed=true"></v-btn>
           </v-card-actions>
 
           <v-expand-transition>
@@ -67,7 +77,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted } from 'vue';
-  import axios, { AxiosError } from 'axios';
+  import axios from 'axios';
 
   enum EquationExerciseType {
     OhmsLaw = "OhmsLaw",
