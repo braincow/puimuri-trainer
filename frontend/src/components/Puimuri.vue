@@ -136,10 +136,12 @@
     } catch (error: any) {
       if (error.response) {
         const response = error.response;
-        exercises.value[index].solution = response.data;
-        exercises.value[index].answerCorrect = false; // users answer was incorrect
+        if (response.status == 412) {
+          exercises.value[index].solution = response.data;
+          exercises.value[index].answerCorrect = false; // users answer was incorrect
 
-        fetchExercise();
+          fetchExercise();
+        }
       } else {
         console.error(error);
       }
