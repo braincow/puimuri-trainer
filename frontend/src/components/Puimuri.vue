@@ -20,7 +20,7 @@
         fill-dot
         :icon="getCardIcon(index)"
       >
-        <v-card class="mx-auto" :color="getCardColor(index)" ref="eq_card-{index}">
+        <v-card class="mx-auto" :color="getCardColor(index)" :id="getCardId(index)">
           <v-card-title>Harjoitus {{ amalgam.exercise.exercise_type }}</v-card-title>
           <v-card-text>
             <p>
@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, nextTick } from 'vue';
   import axios from 'axios';
 
   enum EquationExerciseType {
@@ -123,6 +123,10 @@
   const exercises = ref<EquationExerciseAmalgam[]>([]);
   const loadingError = ref<boolean>(false);
 
+  const getCardId = (id: number) => {
+    return "eq_card-" + id
+  };
+
   const fetchExercise = async () => {
     try {
       const response = await axios.get<EquationExercise>('/api/equation');
@@ -133,7 +137,11 @@
         solution: undefined,
         revealed: false
       });
-      loadingError.value=false; 
+      loadingError.value=false;
+
+      // scroll the new box into view
+      await nextTick();
+      document.getElementById("eq_card-" + (exercises.value.length - 1))?.scrollIntoView();
     } catch (error) {
       console.error(error);
       loadingError.value=true;
