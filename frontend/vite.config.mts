@@ -58,4 +58,9 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: '../static', // Output to the static/ directory in the project root
+    emptyOutDir: true, // Clean the output directory before building
+    manifest: true, // Generate a manifest.json for asset mapping (optional but recommended)
+  },
 })
