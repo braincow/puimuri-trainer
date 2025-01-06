@@ -1,14 +1,16 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col 
+    <v-timeline
+      side="end"
+    >
+      <v-timeline-item
         v-for="(amalgam, index) in exercises" 
-        :key="index" 
-        cols="12" 
-        sm="6" 
-        md="4"
+        :key="index"
+        :dot-color="getCardColor(index)"
+        fill-dot
+        :icon="getCardIcon(index)"
       >
-        <v-card class="mx-auto" :color="getCardColor(index)" >
+        <v-card class="mx-auto" :color="getCardColor(index)">
           <v-card-title>Harjoitus {{ amalgam.exercise.exercise_type }}</v-card-title>
           <v-card-text>
             <p>
@@ -37,25 +39,29 @@
               height="100%"
               style="bottom: 0;"
             >
+              <v-card-title>Harjoitus {{ amalgam.exercise.exercise_type }}</v-card-title>
               <v-card-text class="pb-0">
                 <p>Oikea vastaus {{ amalgam.solution?.answer }}</p>
-
-                <p class="text-medium-emphasis" v-for="(step, i) in amalgam.solution?.steps">
-                  {{ i }} {{ step }}
+                <p>Vastauksesi {{ amalgam.answer }} oli
+                  <span v-if="amalgam.answerCorrect === true">OIKEIN!</span>
+                  <span v-else>VÄÄRIN!</span>
+                </p>
+                <p v-for="step in amalgam.solution?.steps">
+                  {{ step }}
                 </p>
               </v-card-text>
 
               <v-card-actions>
                 <v-btn
-                  text="Piilota"
+                  text="Sulje"
                   @click="amalgam.revealed = false"
                 ></v-btn>
               </v-card-actions>
             </v-card>
           </v-expand-transition>
         </v-card>
-      </v-col>
-    </v-row>
+      </v-timeline-item>
+    </v-timeline>
   </v-container>
 </template>
 
@@ -105,6 +111,7 @@
   }
 
   const exercises = ref<EquationExerciseAmalgam[]>([]);
+  const loadingError = ref<boolean>(false);
 
   const fetchExercise = async () => {
     try {
@@ -115,9 +122,11 @@
         answerCorrect: undefined,
         solution: undefined,
         revealed: false
-      }); 
+      });
+      loadingError.value=false; 
     } catch (error) {
       console.error(error);
+      loadingError.value=true;
     }
   };
 
@@ -144,6 +153,7 @@
         }
       } else {
         console.error(error);
+        loadingError.value=true;
       }
     }
   };
@@ -157,6 +167,19 @@
       return 'red'; 
     }
   };
+
+  const getCardIcon = (index: number) => {
+    const exercise = exercises.value[index].exercise;
+
+    if (exercise.exercise_type == EquationExerciseType.OhmsLaw) {
+      return "mdi-resistor"
+    } else if (exercise.exercise_type == EquationExerciseType.Power) {
+      return "mdi-lightning-bolt"
+    } else {
+      return "mdi-calculator-variant"
+    }
+
+  }
 
   onMounted(fetchExercise); // Fetch the exercise when the component is mounted
 
