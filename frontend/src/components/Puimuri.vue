@@ -21,7 +21,7 @@
         :icon="getCardIcon(index)"
       >
         <v-card class="mx-auto" :color="getCardColor(index)" :id="getCardId(index)">
-          <v-card-title>Harjoitus {{ amalgam.exercise.exercise_type }}</v-card-title>
+          <v-card-title>{{ t('pre', { DESC: t("exercise.type" + amalgam.exercise.exercise_type)}) }}</v-card-title>
           <v-card-text>
             <p>
             Ratkaise {{ amalgam.exercise.missing_variable }}, kun 
@@ -78,6 +78,9 @@
 <script setup lang="ts">
   import { ref, onMounted, nextTick } from 'vue';
   import axios from 'axios';
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   enum EquationExerciseType {
     OhmsLaw = "OhmsLaw",
