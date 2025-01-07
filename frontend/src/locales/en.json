@@ -1,3 +1,48 @@
 {
-    
+    "pre": "Exercise {DESC}",
+    "correct": "Your answer {ANSWER} {UNIT} is CORRECT!",
+    "incorrect": "Your answer {ANSWER} {UNIT} is INCORRECT!",
+    "solved": "The correct answer is {ANSWER} {UNIT}.",
+    "calculate": {
+        "ohm": {
+            "u": "Calculate voltage (U), when resistance (R) is {R} Ω and current (I) is {I} A.",
+            "i": "Calculate current (I), when voltage (U) is {U} V and resistance (R) is {R} Ω.",
+            "r": "Calculate resistance (R), when voltage (U) is {U} V and current (I) is {I} A."
+        },
+        "power": {
+            "p": "Calculate power (P), when voltage (U) is {U} V and current (I) is {I} A.",
+            "u": "Calculate voltage (U), when power (P) is {P} W and current (I) is {I} A.",
+            "i": "Calculate current (I), when power (P) is {P} W and voltage (U) is {U} V."
+        },
+        "combined": {
+            "p": "Calculate power (P), when voltage (U) is {U} V and resistance (R) is {R} Ω.",
+            "i": "Calculate current (I), when power (P) is {P} W and resistance (R) is {R} Ω.",
+            "u": "Calculate voltage (U), when power (P) is {P} W and resistance (R) is {R} Ω.",
+            "r": "Calculate resistance (R), when power (P) is {P} W and voltage (U) is {U} V."
+        }
+    },
+    "exercise": {
+        "type": {
+            "OhmsLaw": "Ohm's Law",
+            "Power": "Power Formula",
+            "Combined": "Combination of Ohm's Law and Power Formula"
+        }
+    },
+    "variable": {
+        "Voltage": "voltage",
+        "Current": "current",
+        "Resistance": "resistance",
+        "Power": "power"
+    },
+    "unit": {
+        "Ampere": "amperes",
+        "Volt": "volts",
+        "Ohm": "ohms",
+        "Watt": "watts"
+    },
+    "button": {
+        "show": "Show",
+        "solve": "Solve",
+        "close": "Close"
+    }
 }

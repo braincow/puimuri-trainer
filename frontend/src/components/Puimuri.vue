@@ -21,25 +21,20 @@
         :icon="getCardIcon(index)"
       >
         <v-card class="mx-auto" :color="getCardColor(index)" :id="getCardId(index)">
-          <v-card-title>{{ t('pre', { DESC: t("exercise.type" + amalgam.exercise.exercise_type)}) }}</v-card-title>
+          <v-card-title>{{ t('pre', { DESC: t("exercise.type." + amalgam.exercise.exercise_type)}) }}</v-card-title>
           <v-card-text>
-            <p>
-            Ratkaise {{ amalgam.exercise.missing_variable }}, kun 
-              <span v-for="(variable, i) in amalgam.exercise.given_variables" :key="i">
-                {{ variable[0] }} on {{ variable[1] }} ja
-              </span>
-            </p>
+            <p>{{  getQuestion(index) }}</p>
             <v-text-field 
               v-model="amalgam.answer" 
-              :label="amalgam.exercise.missing_variable" 
+              :label="t('variable.' + amalgam.exercise.missing_variable)" 
               type="number"
               :disabled="amalgam.solution !== undefined"
               @keydown.enter="submitAnswer(index)" 
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <v-btn text="Ratkaise" @click="submitAnswer(index)" :disabled="amalgam.solution !== undefined"></v-btn>
-            <v-btn text="Näytä" :disabled="amalgam.solution === undefined" @click="amalgam.revealed=true"></v-btn>
+            <v-btn :text="t('button.solve')" @click="submitAnswer(index)" :disabled="amalgam.solution !== undefined"></v-btn>
+            <v-btn :text="t('button.show')" :disabled="amalgam.solution === undefined" @click="amalgam.revealed=true"></v-btn>
           </v-card-actions>
 
           <v-expand-transition>
@@ -49,21 +44,25 @@
               height="100%"
               style="bottom: 0;"
             >
-              <v-card-title>Harjoitus {{ amalgam.exercise.exercise_type }}</v-card-title>
+              <v-card-title>{{ t('pre', { DESC: t("exercise.type." + amalgam.exercise.exercise_type)}) }}</v-card-title>
               <v-card-text class="pb-0">
-                <p>Oikea vastaus {{ amalgam.solution?.answer }}</p>
-                <p>Vastauksesi {{ amalgam.answer }} oli
-                  <span v-if="amalgam.answerCorrect === true">OIKEIN!</span>
-                  <span v-else>VÄÄRIN!</span>
+                <p v-if="amalgam.answerCorrect === true">
+                  {{ t('correct', { ANSWER: amalgam.answer, UNIT: t('unit.' + amalgam.solution?.unit ) }) }}
+                </p>
+                <p v-else>
+                  {{ t('incorrect', { ANSWER: amalgam.answer, UNIT: t('unit.' + amalgam.solution?.unit) }) }}
                 </p>
                 <p v-for="step in amalgam.solution?.steps">
                   {{ step }}
+                </p>
+                <p>
+                  {{ t('solved', { ANSWER: amalgam.solution?.answer, UNIT: t('unit.' + amalgam.solution?.unit) }) }}
                 </p>
               </v-card-text>
 
               <v-card-actions>
                 <v-btn
-                  text="Sulje"
+                  :text="t('button.close')"
                   @click="amalgam.revealed = false"
                 ></v-btn>
               </v-card-actions>
@@ -203,5 +202,40 @@
   }
 
   onMounted(fetchExercise); // Fetch the exercise when the component is mounted
+
+  const getQuestion = (index: number) => {
+    const exercise = exercises.value[index].exercise;
+
+    const given = exercise.given_variables;
+
+    if (exercise.exercise_type == EquationExerciseType.OhmsLaw) {
+      if (exercise.missing_variable == EquationVariable.Voltage) {
+        return t("calculate.ohm.u", {R: given[0][1], I: given[1][1] })
+      } else if (exercise.missing_variable == EquationVariable.Current) {
+        return t("calculate.ohm.i", {U: given[0][1], R: given[1][1] })
+      } else if (exercise.missing_variable == EquationVariable.Resistance) {
+        return t("calculate.ohm.r", {U: given[0][1], I: given[1][1] })
+      }
+    } else if (exercise.exercise_type == EquationExerciseType.Power) {
+      if (exercise.missing_variable == EquationVariable.Power) {
+        return t("calculate.power.p", {U: given[0][1], I: given[1][1] })
+      } else if (exercise.missing_variable == EquationVariable.Voltage) {
+        return t("calculate.power.u", {P: given[0][1], I: given[1][1] })
+      } else if (exercise.missing_variable == EquationVariable.Current) {
+        return t("calculate.power.i", {P: given[0][1], U: given[1][1] })
+      }
+    } else {
+      if (exercise.missing_variable == EquationVariable.Power) {
+        return t("calculate.combined.p", {U: given[0][1], R: given[1][1] })
+      } else if (exercise.missing_variable == EquationVariable.Current) {
+        return t("calculate.combined.i", {P: given[0][1], R: given[1][1] })
+      } else if (exercise.missing_variable == EquationVariable.Voltage) {
+        return t("calculate.combined.u", {P: given[0][1], R: given[1][1] })
+      } else {
+        return t("calculate.combined.r", {P: given[0][1], U: given[1][1] })
+      }
+    }
+
+  }
 
 </script>

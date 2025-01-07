@@ -1,21 +1,24 @@
 {
     "pre": "Harjoitus {DESC}",
+    "correct": "Vastauksesi {ANSWER} {UNIT} on OIKEIN!",
+    "incorrect": "Vastauksesi {ANSWER} {UNIT} on VÄÄRIN!",
+    "solved": "Oikea vastaus on siis {ANSWER} {UNIT}.",
     "calculate": {
         "ohm": {
-            "u": "Laske jännite (U), kun vastus (R) on %{R} Ω ja virta (I) on %{I} A.",
-            "i": "Laske virta (I), kun jännite (U) on %{U} V ja vastus (R) on %{R} Ω.",
-            "r": "Laske vastus (R), kun jännite (U) on %{U} V ja virta (I) on %{I} A."
+            "u": "Laske jännite (U), kun vastus (R) on {R} Ω ja virta (I) on {I} A.",
+            "i": "Laske virta (I), kun jännite (U) on {U} V ja vastus (R) on {R} Ω.",
+            "r": "Laske vastus (R), kun jännite (U) on {U} V ja virta (I) on {I} A."
         },
         "power": {
-            "p": "Laske teho (P), kun jännite (U) on %{U} V ja virta (I) on %{I} A.",
-            "u": "Laske jännite (U), kun teho (P) on %{P} W ja virta (I) on %{I} A.",
-            "i": "Laske virta (I), kun teho (P) on %{P} W ja jännite (U) on %{U} V."
+            "p": "Laske teho (P), kun jännite (U) on {U} V ja virta (I) on {I} A.",
+            "u": "Laske jännite (U), kun teho (P) on {P} W ja virta (I) on {I} A.",
+            "i": "Laske virta (I), kun teho (P) on {P} W ja jännite (U) on {U} V."
         },
         "combined": {
-            "p": "Laske teho (P), kun jännite (U) on %{U} V ja vastus (R) on %{R} Ω.",
-            "i": "Laske virta (I), kun teho (P) on %{P} W ja vastus (R) on %{R} Ω.",
-            "u": "Laske jännite (U), kun teho (P) on %{P} W ja vastus (R) on %{R} Ω.",
-            "r": "Laske vastus (R), kun teho (P) on %{P} W ja jännite (U) on %{U} V."
+            "p": "Laske teho (P), kun jännite (U) on {U} V ja vastus (R) on {R} Ω.",
+            "i": "Laske virta (I), kun teho (P) on {P} W ja vastus (R) on {R} Ω.",
+            "u": "Laske jännite (U), kun teho (P) on {P} W ja vastus (R) on {R} Ω.",
+            "r": "Laske vastus (R), kun teho (P) on {P} W ja jännite (U) on {U} V."
         }
     },
     "exercise": {
@@ -36,5 +39,10 @@
         "Volt": "volttia",
         "Ohm": "ohmia",
         "Watt": "wattia"
+    },
+    "button": {
+        "show": "Näytä",
+        "solve": "Ratkaise",
+        "close": "Sulje"
     }
 }
