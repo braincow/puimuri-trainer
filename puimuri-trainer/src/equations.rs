@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use crate::TrainerError;
 
 /// What type of an excerise is in question?
-#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub enum EquationExerciseType {
     /// By default we handle Ohms law
     #[default]
@@ -37,7 +37,7 @@ pub enum EquationVariable {
 }
 
 /// What type of an unit is the ExerciseSolution unit in
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub enum EquationUnit {
     /// Volts
     Volt,
@@ -50,7 +50,7 @@ pub enum EquationUnit {
 }
 
 /// Contains the solution and work needed to reach that answer for a spesific Exercise
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct EquationExerciseSolution {
     /// Shows the work needed to reach the answer
     pub steps: Vec<String>,
@@ -61,7 +61,7 @@ pub struct EquationExerciseSolution {
 }
 
 /// An Excersise that user must solve or which is to be explained to the user
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct EquationExercise {
     /// Type of the exercise
     pub exercise_type: EquationExerciseType,
@@ -307,23 +307,19 @@ impl EquationExerciseBuilder {
         let voltage = self
             .rng
             .gen_range::<f64, _>(self.voltage_range.0..self.voltage_range.1)
-            .round()
-            / 100.0; // Round to 2 decimal places
+            .round();
         let current = self
             .rng
             .gen_range::<f64, _>(self.current_range.0..self.current_range.1)
-            .round()
-            / 100.0; // Round to 2 decimal places
+            .round();
         let resistance = self
             .rng
             .gen_range::<f64, _>(self.resistance_range.0..self.resistance_range.1)
-            .round()
-            / 100.0; // Round to 2 decimal places
+            .round();
         let power = self
             .rng
             .gen_range::<f64, _>(self.power_range.0..self.power_range.1)
-            .round()
-            / 100.0; // Round to 2 decimal places
+            .round();
 
         match self.exercise.exercise_type {
             EquationExerciseType::OhmsLaw => {
@@ -467,5 +463,360 @@ impl EquationExerciseBuilder {
         let exercise_type = exercise_types.choose(&mut self.rng).unwrap();
         self.exercise.exercise_type = *exercise_type;
         self.build()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use approx::assert_relative_eq;
+
+    #[test]
+    fn test_ohms_law_voltage() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::OhmsLaw)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Voltage {
+            let solution = exercise.solve().unwrap();
+            let resistance = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Resistance)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let current = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Current)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, resistance * current, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Volt);
+        }
+    }
+
+    #[test]
+    fn test_ohms_law_current() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::OhmsLaw)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Current {
+            let solution = exercise.solve().unwrap();
+            let voltage = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Voltage)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let resistance = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Resistance)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, voltage / resistance, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Ampere);
+        }
+    }
+
+    #[test]
+    fn test_ohms_law_resistance() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::OhmsLaw)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Resistance {
+            let solution = exercise.solve().unwrap();
+            let voltage = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Voltage)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let current = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Current)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, voltage / current, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Ohm);
+        }
+    }
+
+    #[test]
+    fn test_power_power() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Power)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Power {
+            let solution = exercise.solve().unwrap();
+            let voltage = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Voltage)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let current = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Current)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, voltage * current, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Watt);
+        }
+    }
+
+    #[test]
+    fn test_power_voltage() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Power)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Voltage {
+            let solution = exercise.solve().unwrap();
+            let power = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Power)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let current = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Current)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, power / current, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Volt);
+        }
+    }
+
+    #[test]
+    fn test_power_current() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Power)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Current {
+            let solution = exercise.solve().unwrap();
+            let power = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Power)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let voltage = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Voltage)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, power / voltage, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Ampere);
+        }
+    }
+
+    #[test]
+    fn test_combined_power() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Combined)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Power {
+            let solution = exercise.solve().unwrap();
+            let voltage = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Voltage)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let resistance = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Resistance)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(
+                solution.answer,
+                (voltage * voltage) / resistance,
+                epsilon = 0.01
+            );
+            assert_eq!(solution.unit, EquationUnit::Watt);
+        }
+    }
+
+    #[test]
+    fn test_combined_current() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Combined)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Current {
+            let solution = exercise.solve().unwrap();
+            let power = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Power)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let resistance = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Resistance)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, (power / resistance).sqrt(), epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Ampere);
+        }
+    }
+
+    #[test]
+    fn test_combined_voltage() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Combined)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Voltage {
+            let solution = exercise.solve().unwrap();
+            let power = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Power)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let resistance = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Resistance)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, (power * resistance).sqrt(), epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Volt);
+        }
+    }
+
+    #[test]
+    fn test_combined_resistance() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_type(EquationExerciseType::Combined)
+            .build();
+
+        if exercise.missing_variable == EquationVariable::Resistance {
+            let solution = exercise.solve().unwrap();
+            let power = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Power)
+                .map(|(_, val)| *val)
+                .unwrap();
+            let voltage = exercise
+                .given_variables
+                .iter()
+                .find(|(v, _)| *v == EquationVariable::Voltage)
+                .map(|(_, val)| *val)
+                .unwrap();
+            assert_relative_eq!(solution.answer, (voltage * voltage) / power, epsilon = 0.01);
+            assert_eq!(solution.unit, EquationUnit::Ohm);
+        }
+    }
+
+    #[test]
+    fn test_check_answer_correct() {
+        let exercise = EquationExercise {
+            exercise_type: EquationExerciseType::OhmsLaw,
+            missing_variable: EquationVariable::Resistance,
+            given_variables: vec![
+                (EquationVariable::Voltage, 12.0),
+                (EquationVariable::Current, 2.0),
+            ],
+            correct_answer: Some(6.0),
+        };
+        assert_eq!(exercise.check_answer(6.0, None), Some(true));
+    }
+
+    #[test]
+    fn test_check_answer_incorrect() {
+        let exercise = EquationExercise {
+            exercise_type: EquationExerciseType::OhmsLaw,
+            missing_variable: EquationVariable::Resistance,
+            given_variables: vec![
+                (EquationVariable::Voltage, 12.0),
+                (EquationVariable::Current, 2.0),
+            ],
+            correct_answer: Some(6.0),
+        };
+        assert_eq!(exercise.check_answer(5.0, None), Some(false));
+    }
+
+    #[test]
+    fn test_check_answer_precision() {
+        let exercise = EquationExercise {
+            exercise_type: EquationExerciseType::OhmsLaw,
+            missing_variable: EquationVariable::Resistance,
+            given_variables: vec![
+                (EquationVariable::Voltage, 12.0),
+                (EquationVariable::Current, 2.0),
+            ],
+            correct_answer: Some(6.0),
+        };
+        assert_eq!(exercise.check_answer(6.05, Some(0.1)), Some(true));
+        assert_eq!(exercise.check_answer(6.15, Some(0.1)), Some(false));
+    }
+
+    #[test]
+    fn test_build_exercise() {
+        let exercise = EquationExerciseBuilder::new()
+            .set_voltage_range(10.0, 20.0)
+            .unwrap()
+            .set_current_range(1.0, 5.0)
+            .unwrap()
+            .set_resistance_range(5.0, 15.0)
+            .unwrap()
+            .set_power_range(50.0, 100.0)
+            .unwrap()
+            .set_type(EquationExerciseType::OhmsLaw)
+            .build();
+
+        assert!(exercise.exercise_type == EquationExerciseType::OhmsLaw);
+
+        for &(variable, value) in &exercise.given_variables {
+            match variable {
+                EquationVariable::Voltage => assert!(value >= 10.0 && value <= 20.0),
+                EquationVariable::Current => assert!(value >= 1.0 && value <= 5.0),
+                EquationVariable::Resistance => assert!(value >= 5.0 && value <= 15.0),
+                EquationVariable::Power => assert!(value >= 50.0 && value <= 100.0),
+            }
+        }
+    }
+
+    #[test]
+    fn test_build_exercise_random_type() {
+        let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+        assert!(
+            exercise.exercise_type == EquationExerciseType::OhmsLaw
+                || exercise.exercise_type == EquationExerciseType::Power
+                || exercise.exercise_type == EquationExerciseType::Combined
+        );
+    }
+
+    #[test]
+    fn test_set_invalid_ranges() {
+        assert!(EquationExerciseBuilder::new()
+            .set_voltage_range(20.0, 10.0)
+            .is_err());
+        assert!(EquationExerciseBuilder::new()
+            .set_current_range(5.0, 1.0)
+            .is_err());
+        assert!(EquationExerciseBuilder::new()
+            .set_resistance_range(15.0, 5.0)
+            .is_err());
+        assert!(EquationExerciseBuilder::new()
+            .set_power_range(100.0, 50.0)
+            .is_err());
     }
 }
