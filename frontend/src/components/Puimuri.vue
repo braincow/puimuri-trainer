@@ -33,7 +33,7 @@
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <v-btn :text="t('button.solve')" @click="submitAnswer(index)" :disabled="amalgam.solution !== undefined"></v-btn>
+            <v-btn :text="t('button.solve')" @click="submitAnswer(index)" :disabled="amalgam.solution !== undefined || !amalgam.answer"></v-btn>
             <v-btn :text="t('button.show')" :disabled="amalgam.solution === undefined" @click="amalgam.revealed=true"></v-btn>
           </v-card-actions>
 
@@ -151,6 +151,11 @@
   };
 
   const submitAnswer = async (index: number) => {
+    if (!exercises.value[index].answer) {
+      console.log("cowardly refusing to send an empty answer.")
+      return;
+    }
+
     try {
       const response = await axios.post(`/api/equation/answer/${exercises.value[index].answer}`, exercises.value[index].exercise, {
         headers: {
