@@ -4,7 +4,7 @@
 //!
 //! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
 
-use puimuri_trainer::equations::{
+use puimuri_rest::equations::{
     EquationExercise, EquationExerciseBuilder, EquationExerciseSolution,
 };
 use rocket::{fs::FileServer, serde::json::Json};

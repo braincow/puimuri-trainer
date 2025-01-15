@@ -5,5 +5,11 @@ edition = "2021"
 
 [dependencies]
 rocket = { version = "0.5.1", features = ["json"] }
-puimuri-trainer = { path = "puimuri-trainer" }
 dotenv = "0.15.0"
+eyre = "0.6.12"
+rand = "0.8.5"
+serde = { version = "1.0.217", features = ["derive"] }
+thiserror = "2.0.11"
+
+[dev-dependencies]
+approx = "0.5.1"
