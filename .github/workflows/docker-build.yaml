@@ -59,11 +59,11 @@ jobs:
       id: commit
       run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-    # - name: Deploy to Cloud Run
-    #   run: |
-    #     gcloud run deploy ${{ vars.SERVICE_NAME }} \
-    #       --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }} \
-    #       --region ${{ vars.REGION }} \
-    #       --allow-unauthenticated \
-    #       --project ${{ vars.PROJECT_ID }} \
-    #       --service-account ${{ vars.SERVICE_NAME }}@${{ vars.PROJECT_ID }}.iam.gserviceaccount.com
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy ${{ vars.SERVICE_NAME }} \
+          --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }} \
+          --region ${{ vars.REGION }} \
+          --allow-unauthenticated \
+          --project ${{ vars.PROJECT_ID }} \
+          --service-account ${{ vars.SERVICE_NAME }}@${{ vars.PROJECT_ID }}.iam.gserviceaccount.com
