@@ -4,9 +4,7 @@
 //!
 //! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
 
-use puimuri_trainer::equations::{
-    EquationExercise, EquationExerciseBuilder, EquationExerciseSolution,
-};
+use puimuri_trainer::equations::{EquationExercise, EquationExerciseSolution};
 use rocket::{fs::FileServer, serde::json::Json};
 use std::{env, path::PathBuf};
 
@@ -15,8 +13,7 @@ extern crate rocket;
 
 #[get("/equation")]
 fn equation() -> Json<EquationExercise> {
-    let exercise_builder = EquationExerciseBuilder::default();
-    let exercise = exercise_builder.build_with_random_exercisetype();
+    let exercise = EquationExercise::new().build_with_random_exercisetype();
     Json(exercise)
 }
 
@@ -85,11 +82,10 @@ mod test {
     #[test]
     fn equation_answer_endpoint_incorrect() {
         let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
-        let answer = exercise.solve().unwrap().answer;
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
-            .post(uri!("/api", super::equation_answer(answer / 2.0)))
+            .post(uri!("/api", super::equation_answer(-1.1))) // we should never see in default configuration answers under 0
             .body(json::to_string(&exercise).unwrap())
             .dispatch();
         assert_eq!(response.status(), Status::PreconditionFailed);
