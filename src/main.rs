@@ -50,3 +50,52 @@ fn rocket() -> _ {
 
     rocket.mount("/api", routes![equation, equation_answer])
 }
+
+#[cfg(test)]
+mod test {
+    use super::rocket;
+    use puimuri_trainer::equations::{EquationExercise, EquationExerciseBuilder};
+    use rocket::http::Status;
+    use rocket::local::blocking::Client;
+    use rocket::serde::json;
+
+    #[test]
+    fn equation_endpoint() {
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
+        let response = client.get(uri!("/api", super::equation)).dispatch();
+        assert_eq!(response.status(), Status::Ok);
+
+        let exercise = response.into_json::<EquationExercise>();
+        assert_eq!(exercise.is_some(), true);
+    }
+
+    #[test]
+    fn equation_answer_endpoint_correct() {
+        let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
+        let response = client
+            .post(uri!(
+                "/api",
+                super::equation_answer(exercise.correct_answer.unwrap())
+            ))
+            .body(json::to_string(&exercise).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
+    }
+
+    #[test]
+    fn equation_answer_endpoint_incorrect() {
+        let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
+        let response = client
+            .post(uri!(
+                "/api",
+                super::equation_answer(exercise.correct_answer.unwrap() / 2.0)
+            ))
+            .body(json::to_string(&exercise).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::PreconditionFailed);
+    }
+}
