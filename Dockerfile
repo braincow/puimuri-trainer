@@ -1,10 +1,12 @@
 FROM scratch
 
-ARG PORT=8080
-ENV ROCKET_PORT=$PORT
-ENV ROCKET_ADDRESS=0.0.0.0
+ARG PORT=8000
+ARG ADDRESS=0.0.0.0
 
-COPY target/x86_64-unknown-linux-musl/release/puimuri-rest /puimuri-rest
+ENV ROCKET_PORT=$PORT
+ENV ROCKET_ADDRESS=$ADDRESS
+
+COPY target/x86_64-unknown-linux-musl/release/puimuri-trainer /
 COPY static /static
 
-ENTRYPOINT [ "/puimuri-rest" ]
+ENTRYPOINT [ "/puimuri-trainer" ]
