@@ -1,4 +1,4 @@
-name: Build Docker Image with Git Commit Tag
+name: Build and Deploy to GCP
 
 on:
   push:
@@ -22,3 +22,44 @@ jobs:
 
     - name: Build Docker image
       run: docker build -t puimuri-trainer:${{ steps.commit.outputs.sha }} .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get Git commit SHA
+      id: commit
+      run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev
+
+    - name: Re-tag Docker image
+      run: |
+        docker tag my-docker-image:${{ steps.commit.outputs.sha }} \
+        ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }}
+
+    - name: Push Docker image to Artifact Registry
+      run: docker push ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }}
+
+    # - name: Deploy to Cloud Run
+    #   run: |
+    #     gcloud run deploy ${{ vars.SERVICE_NAME }} \
+    #       --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }} \
+    #       --region ${{ vars.REGION }} \
+    #       --allow-unauthenticated \
+    #       --project ${{ vars.PROJECT_ID }} \
+    #       --service-account ${{ vars.SERVICE_NAME }}@${{ vars.PROJECT_ID }}.iam.gserviceaccount.com
