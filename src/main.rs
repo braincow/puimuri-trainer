@@ -51,7 +51,7 @@ fn rocket() -> _ {
 #[cfg(test)]
 mod test {
     use super::rocket;
-    use puimuri_trainer::equations::{EquationExercise, EquationExerciseBuilder};
+    use puimuri_trainer::equations::EquationExercise;
     use rocket::http::Status;
     use rocket::local::blocking::Client;
     use rocket::serde::json;
@@ -68,7 +68,7 @@ mod test {
 
     #[test]
     fn equation_answer_endpoint_correct() {
-        let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+        let exercise = EquationExercise::new().build_with_random_exercisetype();
         let answer = exercise.solve().unwrap().answer;
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
@@ -81,7 +81,7 @@ mod test {
 
     #[test]
     fn equation_answer_endpoint_incorrect() {
-        let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+        let exercise = EquationExercise::new().build_with_random_exercisetype();
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
