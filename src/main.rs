@@ -72,13 +72,11 @@ mod test {
     #[test]
     fn equation_answer_endpoint_correct() {
         let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+        let answer = exercise.solve().unwrap().answer;
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
-            .post(uri!(
-                "/api",
-                super::equation_answer(exercise.correct_answer.unwrap())
-            ))
+            .post(uri!("/api", super::equation_answer(answer)))
             .body(json::to_string(&exercise).unwrap())
             .dispatch();
         assert_eq!(response.status(), Status::Ok);
@@ -87,13 +85,11 @@ mod test {
     #[test]
     fn equation_answer_endpoint_incorrect() {
         let exercise = EquationExerciseBuilder::new().build_with_random_exercisetype();
+        let answer = exercise.solve().unwrap().answer;
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
-            .post(uri!(
-                "/api",
-                super::equation_answer(exercise.correct_answer.unwrap() / 2.0)
-            ))
+            .post(uri!("/api", super::equation_answer(answer / 2.0)))
             .body(json::to_string(&exercise).unwrap())
             .dispatch();
         assert_eq!(response.status(), Status::PreconditionFailed);
