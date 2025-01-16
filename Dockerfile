@@ -16,6 +16,6 @@ ENV PORT 8080
 ENV ROCKET_PORT ${PORT}
 ENV ROCKET_ADDRESS 0.0.0.0
 COPY --from=rust_build /workdir/target/x86_64-unknown-linux-musl/release/puimuri-trainer /
-COPY --from=node_build /workdir/frontend/dist/* /static
+COPY --from=node_build /workdir/frontend/dist /static
 EXPOSE ${ROCKET_PORT}
 ENTRYPOINT [ "/puimuri-trainer" ]
