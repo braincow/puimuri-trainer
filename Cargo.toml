@@ -1,11 +1,10 @@
 [package]
-name = "puimuri-rest"
+name = "puimuri-trainer"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 rocket = { version = "0.5.1", features = ["json"] }
-dotenv = "0.15.0"
 eyre = "0.6.12"
 rand = "0.8.5"
 serde = { version = "1.0.217", features = ["derive"] }

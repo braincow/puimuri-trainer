@@ -4,7 +4,7 @@
 //!
 //! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
 
-use puimuri_rest::equations::{
+use puimuri_trainer::equations::{
     EquationExercise, EquationExerciseBuilder, EquationExerciseSolution,
 };
 use rocket::{fs::FileServer, serde::json::Json};
@@ -40,8 +40,6 @@ fn equation_answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerRespo
 
 #[launch]
 fn rocket() -> _ {
-    dotenv::dotenv().ok();
-
     let mut rocket = rocket::build();
 
     let frontend_dir = env::var("PUIMURI_FRONTEND_DIR").unwrap_or("static".to_string());
