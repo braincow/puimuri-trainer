@@ -62,8 +62,8 @@ jobs:
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy ${{ vars.SERVICE_NAME }} \
-          --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }} \
-          --region ${{ vars.REGION }} \
+          --image ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }} \
+          --region ${{ vars.GCP_REGION }} \
           --allow-unauthenticated \
-          --project ${{ vars.PROJECT_ID }} \
-          --service-account ${{ vars.SERVICE_NAME }}@${{ vars.PROJECT_ID }}.iam.gserviceaccount.com
+          --project ${{ vars.GCP_PROJECT_ID }} \
+          --service-account ${{ vars.SERVICE_NAME }}@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
