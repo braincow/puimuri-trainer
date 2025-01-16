@@ -2,7 +2,7 @@ FROM rust:alpine AS rust_build
 WORKDIR /workdir
 COPY . .
 RUN apk add --no-cache musl musl-dev
-RUN cargo test
+RUN cargo test --release
 RUN cargo build --release --target=x86_64-unknown-linux-musl
 
 FROM node:alpine as node_build
