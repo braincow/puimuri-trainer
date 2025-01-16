@@ -1,0 +1,24 @@
+name: Build Docker Image with Git Commit Tag
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get Git commit SHA
+      id: commit
+      run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Build Docker image
+      run: docker build -t puimuri-trainer:${{ steps.commit.outputs.sha }} .
