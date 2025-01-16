@@ -67,3 +67,10 @@ jobs:
           --allow-unauthenticated \
           --project ${{ vars.GCP_PROJECT_ID }} \
           --service-account ${{ vars.SERVICE_NAME }}@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+
+    - name: Route traffic to new revision
+      run: |
+        gcloud run services update-traffic ${{ vars.SERVICE_NAME }} \
+          --region ${{ vars.GCP_REGION }} \
+          --project ${{ vars.GCP_PROJECT_ID }} \
+          --to-latest
