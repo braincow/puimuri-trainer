@@ -49,7 +49,7 @@ jobs:
 
     - name: Re-tag Docker image
       run: |
-        docker tag my-docker-image:${{ steps.commit.outputs.sha }} \
+        docker tag puimuri-trainer:${{ steps.commit.outputs.sha }} \
         ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.REPOSITORY }}/${{ vars.SERVICE_NAME }}:${{ steps.commit.outputs.sha }}
 
     - name: Push Docker image to Artifact Registry
