@@ -44,5 +44,6 @@
         "show": "Show",
         "solve": "Solve",
         "close": "Close"
-    }
+    },
+    "footer": "Contact the author and download the open sourced code via Github."
 }

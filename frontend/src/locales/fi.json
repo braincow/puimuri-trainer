@@ -44,5 +44,6 @@
         "show": "Näytä",
         "solve": "Ratkaise",
         "close": "Sulje"
-    }
+    },
+    "footer": "Ota yhteyttä tekijään ja lataa avoin lähdekoodi Githubin kautta."
 }
