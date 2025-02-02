@@ -76,7 +76,7 @@ pub struct EquationExercise {
 
 impl EquationExercise {
     /// Creates a new ExcerciseBuilder that can build a new exercise
-    pub fn new() -> EquationExerciseBuilder {
+    pub fn builder() -> EquationExerciseBuilder {
         EquationExerciseBuilder::new()
     }
 

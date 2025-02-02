@@ -13,7 +13,7 @@ extern crate rocket;
 
 #[get("/equation")]
 fn equation() -> Json<EquationExercise> {
-    let exercise = EquationExercise::new().build_with_random_exercisetype();
+    let exercise = EquationExercise::builder().build_with_random_exercisetype();
     Json(exercise)
 }
 
@@ -68,7 +68,7 @@ mod test {
 
     #[test]
     fn equation_answer_endpoint_correct() {
-        let exercise = EquationExercise::new().build_with_random_exercisetype();
+        let exercise = EquationExercise::builder().build_with_random_exercisetype();
         let answer = exercise.solve().unwrap().answer;
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
@@ -81,7 +81,7 @@ mod test {
 
     #[test]
     fn equation_answer_endpoint_incorrect() {
-        let exercise = EquationExercise::new().build_with_random_exercisetype();
+        let exercise = EquationExercise::builder().build_with_random_exercisetype();
 
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
