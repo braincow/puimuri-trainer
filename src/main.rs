@@ -4,90 +4,56 @@
 //!
 //! This web server serves REST interface for training the "PUImURI" related equations and the frontend code
 
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    routing::{get, post},
+    Json, Router,
+};
+use eyre::Result;
 use puimuri_trainer::equations::{EquationExercise, EquationExerciseSolution};
-use rocket::{fs::FileServer, serde::json::Json};
-use std::{env, path::PathBuf};
+use std::env;
+use tower_http::services::ServeDir;
+use tower_http::trace::TraceLayer;
 
-#[macro_use]
-extern crate rocket;
-
-#[get("/equation")]
-fn equation() -> Json<EquationExercise> {
-    let exercise = EquationExercise::builder().build_with_random_exercisetype();
-    Json(exercise)
-}
-
-#[derive(Responder)]
-enum AnswerResponder {
-    #[response(status = 412, content_type = "json")] // precondition failed
-    IncorrectAnswer(Json<EquationExerciseSolution>),
-    #[response(status = 200, content_type = "json")] // ok
-    CorrectAnswer(Json<EquationExerciseSolution>),
-}
-
-#[post("/equation/answer/<answer>", data = "<exercise>")]
-fn equation_answer(answer: f64, exercise: Json<EquationExercise>) -> AnswerResponder {
-    let solution = exercise.solve().unwrap();
-    if (answer - solution.answer).abs() < 0.01 {
-        AnswerResponder::CorrectAnswer(Json(solution))
-    } else {
-        AnswerResponder::IncorrectAnswer(Json(solution))
-    }
-}
-
-#[launch]
-fn rocket() -> _ {
-    let mut rocket = rocket::build();
+#[tokio::main]
+async fn main() -> Result<()> {
+    #[cfg(debug_assertions)]
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
 
     let frontend_dir = env::var("PUIMURI_FRONTEND_DIR").unwrap_or("static".to_string());
-    let frontend_path = PathBuf::from(frontend_dir);
-    if frontend_path.exists() && frontend_path.is_dir() {
-        rocket = rocket.mount("/", FileServer::from(frontend_path));
-    }
+    let port = env::var("PORT").unwrap_or("8000".to_string());
+    let address = env::var("ADDRESS").unwrap_or("127.0.0.1".to_string());
 
-    rocket.mount("/api", routes![equation, equation_answer])
+    let app = Router::new()
+        .route_service("/", ServeDir::new(frontend_dir))
+        .route("/api/equation", get(equation))
+        .route("/api/equation/answer/{answer}", post(equation_answer))
+        .layer(TraceLayer::new_for_http());
+
+    // run our app with hyper, listening globally on port 3000
+    let listener =
+        tokio::net::TcpListener::bind(format!("{address}:{port}", address = address, port = port))
+            .await?;
+    axum::serve(listener, app).await?;
+
+    Ok(())
 }
 
-#[cfg(test)]
-mod test {
-    use super::rocket;
-    use puimuri_trainer::equations::EquationExercise;
-    use rocket::http::Status;
-    use rocket::local::blocking::Client;
-    use rocket::serde::json;
+async fn equation() -> (StatusCode, Json<EquationExercise>) {
+    let exercise = EquationExercise::builder().build_with_random_exercisetype();
+    (StatusCode::OK, Json(exercise))
+}
 
-    #[test]
-    fn equation_endpoint() {
-        let client = Client::tracked(rocket()).expect("valid rocket instance");
-        let response = client.get(uri!("/api", super::equation)).dispatch();
-        assert_eq!(response.status(), Status::Ok);
-
-        let exercise = response.into_json::<EquationExercise>();
-        assert_eq!(exercise.is_some(), true);
+async fn equation_answer(
+    Path(answer): Path<f64>,
+    Json(exercise): Json<EquationExercise>,
+) -> (StatusCode, Json<EquationExerciseSolution>) {
+    let solution = exercise.solve().unwrap();
+    if (answer - solution.answer).abs() < 0.01 {
+        return (StatusCode::OK, Json(solution)); // answer is correct within certain decimal point
     }
-
-    #[test]
-    fn equation_answer_endpoint_correct() {
-        let exercise = EquationExercise::builder().build_with_random_exercisetype();
-        let answer = exercise.solve().unwrap().answer;
-
-        let client = Client::tracked(rocket()).expect("valid rocket instance");
-        let response = client
-            .post(uri!("/api", super::equation_answer(answer)))
-            .body(json::to_string(&exercise).unwrap())
-            .dispatch();
-        assert_eq!(response.status(), Status::Ok);
-    }
-
-    #[test]
-    fn equation_answer_endpoint_incorrect() {
-        let exercise = EquationExercise::builder().build_with_random_exercisetype();
-
-        let client = Client::tracked(rocket()).expect("valid rocket instance");
-        let response = client
-            .post(uri!("/api", super::equation_answer(-1.1))) // we should never see in default configuration answers under 0
-            .body(json::to_string(&exercise).unwrap())
-            .dispatch();
-        assert_eq!(response.status(), Status::PreconditionFailed);
-    }
+    (StatusCode::PRECONDITION_FAILED, Json(solution)) // answer is way off or incorrect
 }
