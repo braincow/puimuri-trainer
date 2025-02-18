@@ -28,12 +28,11 @@ async fn main() -> Result<()> {
     let address = env::var("ADDRESS").unwrap_or("127.0.0.1".to_string());
 
     let app = Router::new()
-        .route_service("/", ServeDir::new(frontend_dir))
+        .fallback_service(ServeDir::new(frontend_dir))
         .route("/api/equation", get(equation))
         .route("/api/equation/answer/{answer}", post(equation_answer))
         .layer(TraceLayer::new_for_http());
 
-    // run our app with hyper, listening globally on port 3000
     let listener =
         tokio::net::TcpListener::bind(format!("{address}:{port}", address = address, port = port))
             .await?;
