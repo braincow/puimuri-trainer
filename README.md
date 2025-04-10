@@ -106,7 +106,7 @@ Project Link: [https://github.com/braincow/puimuri-trainer](https://github.com/b
 ## Acknowledgements
 
 -   [Rust Community](https://www.rust-lang.org/)
--   [Rocket.rs](https://rocket.rs/)
+-   [Axum](https://github.com/tokio-rs/axum)
 -   [Vue.js](https://vuejs.org/)
 -   [Vuetify](https://vuetifyjs.com/)
 -   [Vue i18n](https://kazupon.github.io/vue-i18n/)
