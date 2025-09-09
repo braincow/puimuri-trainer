@@ -306,19 +306,19 @@ impl EquationExerciseBuilder {
     pub fn build(mut self) -> EquationExercise {
         let voltage = self
             .rng
-            .gen_range(self.voltage_range.0..self.voltage_range.1)
+            .random_range(self.voltage_range.0..self.voltage_range.1)
             .round();
         let current = self
             .rng
-            .gen_range(self.current_range.0..self.current_range.1)
+            .random_range(self.current_range.0..self.current_range.1)
             .round();
         let resistance = self
             .rng
-            .gen_range(self.resistance_range.0..self.resistance_range.1)
+            .random_range(self.resistance_range.0..self.resistance_range.1)
             .round();
         let power = self
             .rng
-            .gen_range(self.power_range.0..self.power_range.1)
+            .random_range(self.power_range.0..self.power_range.1)
             .round();
 
         match self.exercise.exercise_type {
