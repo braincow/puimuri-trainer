@@ -1,18 +1,18 @@
 [package]
 name = "puimuri-trainer"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
-axum = { version = "0.8.1", features = ["http2"] }
+axum = { version = "0.8.4", features = ["http2"] }
 eyre = "0.6.12"
-rand = "0.8.5"
-serde = { version = "1.0.217", features = ["derive"] }
-thiserror = "2.0.11"
-tokio = { version = "1.43.0", features = ["rt-multi-thread"] }
-tower-http = { version = "0.6.2", features = ["fs", "trace"] }
+rand = "0.9.2"
+serde = { version = "1.0.219", features = ["derive"] }
+thiserror = "2.0.16"
+tokio = { version = "1.47.1", features = ["rt-multi-thread"] }
+tower-http = { version = "0.6.6", features = ["fs", "trace"] }
 tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
+tracing-subscriber = "0.3.20"
 
 [dev-dependencies]
 approx = "0.5.1"

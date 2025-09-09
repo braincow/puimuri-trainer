@@ -5,7 +5,7 @@
 //! This library provides a trainer implementation that creates and solves excercesis
 
 use eyre::{Context, Result};
-use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
+use rand::{seq::SliceRandom, rngs::ThreadRng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::TrainerError;
@@ -306,24 +306,24 @@ impl EquationExerciseBuilder {
     pub fn build(mut self) -> EquationExercise {
         let voltage = self
             .rng
-            .gen_range::<f64, _>(self.voltage_range.0..self.voltage_range.1)
+            .gen_range(self.voltage_range.0..self.voltage_range.1)
             .round();
         let current = self
             .rng
-            .gen_range::<f64, _>(self.current_range.0..self.current_range.1)
+            .gen_range(self.current_range.0..self.current_range.1)
             .round();
         let resistance = self
             .rng
-            .gen_range::<f64, _>(self.resistance_range.0..self.resistance_range.1)
+            .gen_range(self.resistance_range.0..self.resistance_range.1)
             .round();
         let power = self
             .rng
-            .gen_range::<f64, _>(self.power_range.0..self.power_range.1)
+            .gen_range(self.power_range.0..self.power_range.1)
             .round();
 
         match self.exercise.exercise_type {
             EquationExerciseType::OhmsLaw => {
-                let missing_variable = [
+                let missing_variable = *[
                     EquationVariable::Voltage,
                     EquationVariable::Current,
                     EquationVariable::Resistance,
@@ -350,7 +350,7 @@ impl EquationExerciseBuilder {
                     }
                     _ => unreachable!(),
                 };
-                self.exercise.missing_variable = *missing_variable;
+                self.exercise.missing_variable = missing_variable;
                 self.exercise.given_variables = given_variables;
                 #[cfg(debug_assertions)]
                 {
@@ -358,7 +358,7 @@ impl EquationExerciseBuilder {
                 }
             }
             EquationExerciseType::Power => {
-                let missing_variable = [
+                let missing_variable = *[
                     EquationVariable::Power,
                     EquationVariable::Voltage,
                     EquationVariable::Current,
@@ -384,7 +384,7 @@ impl EquationExerciseBuilder {
                     }
                     _ => unreachable!(),
                 };
-                self.exercise.missing_variable = *missing_variable;
+                self.exercise.missing_variable = missing_variable;
                 self.exercise.given_variables = given_variables;
                 #[cfg(debug_assertions)]
                 {
@@ -392,7 +392,7 @@ impl EquationExerciseBuilder {
                 }
             }
             EquationExerciseType::Combined => {
-                let selection = [
+                let selection = *[
                     (
                         EquationVariable::Voltage,
                         EquationVariable::Resistance,
@@ -460,8 +460,8 @@ impl EquationExerciseBuilder {
             EquationExerciseType::Power,
             EquationExerciseType::Combined,
         ];
-        let exercise_type = exercise_types.choose(&mut self.rng).unwrap();
-        self.exercise.exercise_type = *exercise_type;
+        let exercise_type = *exercise_types.choose(&mut self.rng).unwrap();
+        self.exercise.exercise_type = exercise_type;
         self.build()
     }
 }

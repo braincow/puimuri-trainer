@@ -12,8 +12,8 @@ RUN npm install
 RUN npm run build
 
 FROM scratch
-ENV PORT 8080
-ENV ADDRESS 0.0.0.0
+ENV PORT=8080
+ENV ADDRESS=0.0.0.0
 COPY --from=rust_build /workdir/target/x86_64-unknown-linux-musl/release/puimuri-trainer /
 COPY --from=node_build /workdir/frontend/dist /static
 EXPOSE ${PORT}
