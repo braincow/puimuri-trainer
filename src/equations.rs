@@ -5,7 +5,7 @@
 //! This library provides a trainer implementation that creates and solves excercesis
 
 use eyre::{Context, Result};
-use rand::{prelude::IndexedRandom, rngs::ThreadRng, Rng};
+use rand::{seq::SliceRandom, rngs::ThreadRng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::TrainerError;
@@ -245,7 +245,7 @@ impl Default for EquationExerciseBuilder {
             current_range: (0.1, 10.0),
             resistance_range: (1.0, 1000.0),
             power_range: (1.0, 2400.0),
-            rng: rand::rng(),
+            rng: rand::thread_rng(),
         }
     }
 }
@@ -306,19 +306,19 @@ impl EquationExerciseBuilder {
     pub fn build(mut self) -> EquationExercise {
         let voltage = self
             .rng
-            .random_range(self.voltage_range.0..self.voltage_range.1)
+            .gen_range(self.voltage_range.0..self.voltage_range.1)
             .round();
         let current = self
             .rng
-            .random_range(self.current_range.0..self.current_range.1)
+            .gen_range(self.current_range.0..self.current_range.1)
             .round();
         let resistance = self
             .rng
-            .random_range(self.resistance_range.0..self.resistance_range.1)
+            .gen_range(self.resistance_range.0..self.resistance_range.1)
             .round();
         let power = self
             .rng
-            .random_range(self.power_range.0..self.power_range.1)
+            .gen_range(self.power_range.0..self.power_range.1)
             .round();
 
         match self.exercise.exercise_type {
